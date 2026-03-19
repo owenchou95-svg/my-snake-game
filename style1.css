@@ -1,0 +1,433 @@
+/* 全局样式重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: #333;
+    /* 移动端关键：禁止iOS的弹性滚动和下拉刷新 */
+    overscroll-behavior: none;
+    /* 固定视口，防止地址栏伸缩导致布局跳动 */
+    height: 100dvh; /* 使用动态视口高度适配移动浏览器 */
+    touch-action: manipulation; /* 优化点击响应，禁用双击缩放 */
+}
+
+/* 游戏容器 */
+.game-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 24px;
+    max-width: 480px;
+    width: 100%;
+    position: relative;
+}
+
+/* 游戏头部 */
+.game-header {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.game-header h1 {
+    font-size: 2rem;
+    color: #667eea;
+    margin-bottom: 16px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 分数板 */
+.score-board {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 16px;
+}
+
+.score-item {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    min-width: 120px;
+    text-align: center;
+}
+
+.score-label {
+    display: block;
+    font-size: 0.72rem;
+    margin-bottom: 4px;
+    opacity: 0.9;
+}
+
+.score-value {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+/* 画布容器 */
+.canvas-wrapper {
+    position: relative;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+#gameCanvas {
+    display: block;
+    background: #2c3e50;
+    width: 100%;
+    height: auto;
+    border: 3px solid #34495e;
+    border-radius: 10px;
+    /* 移动端触摸优化：禁用浏览器默认手势 */
+    touch-action: none;
+    /* 提升点击区域，方便触摸 */
+    cursor: pointer;
+    /* 防止iOS长按弹出菜单 */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* 控制说明 */
+.controls-info {
+    text-align: center;
+    color: #555;
+    font-size: 0.72rem;
+    line-height: 1.8;
+}
+
+.controls-info p {
+    margin: 6px 0;
+}
+
+.controls-info kbd {
+    background: #f0f0f0;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    padding: 3px 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 0 2px;
+}
+
+/* 游戏遮罩层 */
+.game-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    z-index: 10;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.game-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.overlay-content {
+    text-align: center;
+    color: white;
+    padding: 32px;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.overlay-title {
+    font-size: 2rem;
+    margin-bottom: 16px;
+    color: #667eea;
+}
+
+.overlay-message {
+    font-size: 0.96rem;
+    margin-bottom: 24px;
+    color: #ccc;
+}
+
+/* 按钮样式 */
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    font-size: 0.96rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* ========== 移动端/PC端内容切换 ========== */
+/* 默认隐藏移动端内容 */
+.mobile-only {
+    display: none;
+}
+
+/* 默认显示PC端内容 */
+.desktop-only {
+    display: block;
+}
+
+/* 虚拟控制按键容器（默认隐藏） */
+.virtual-controls {
+    display: none;
+}
+
+/* ========== 触摸设备专属样式 ========== */
+/* 通过检测设备能力而非屏幕宽度来判断是否为触摸设备 */
+@media (hover: none) and (pointer: coarse) {
+    /* 隐藏PC端内容 */
+    .desktop-only {
+        display: none !important;
+    }
+
+    /* 显示移动端内容 */
+    .mobile-only {
+        display: block !important;
+    }
+
+    /* 虚拟按键容器显示 */
+    .virtual-controls {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        padding: 10px 0;
+    }
+
+    /* 虚拟方向键整体布局 */
+    .d-pad {
+        display: grid;
+        grid-template-columns: repeat(3, 60px);
+        grid-template-rows: repeat(2, 60px);
+        gap: 8px;
+        position: relative;
+    }
+
+    /* 方向键按钮通用样式 */
+    .d-btn {
+        width: 60px;
+        height: 60px;
+        border: none;
+        border-radius: 12px;
+        background: rgba(102, 126, 234, 0.3);
+        backdrop-filter: blur(10px);
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+        /* 防止iOS长按弹出菜单 */
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+        /* 禁用默认触摸行为 */
+        touch-action: manipulation;
+        /* SVG图标尺寸 */
+        padding: 0;
+    }
+
+    .d-btn svg {
+        width: 28px;
+        height: 28px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    /* 按钮按下状态 */
+    .d-btn:active {
+        background: rgba(102, 126, 234, 0.6);
+        transform: scale(0.92);
+    }
+
+    /* 按钮位置布局 */
+    .d-btn-up {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .d-btn-down {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+    .d-middle {
+        grid-column: 1 / 4;
+        grid-row: 1 / 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .d-center {
+        width: 60px;
+        height: 60px;
+    }
+
+    /* 控制说明在移动端优化 */
+    .controls-info {
+        margin-bottom: 0;
+    }
+
+    .controls-info p {
+        margin: 4px 0;
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 520px) {
+    body {
+        padding: 12px;
+    }
+
+    .game-container {
+        padding: 16px;
+    }
+
+    .game-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .score-board {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .score-item {
+        min-width: auto;
+        padding: 8px 16px;
+    }
+
+    .controls-info {
+        font-size: 0.64rem;
+    }
+
+    .overlay-title {
+        font-size: 1.6rem;
+    }
+
+    .overlay-message {
+        font-size: 0.8rem;
+    }
+
+    .btn-primary {
+        padding: 10px 24px;
+        font-size: 0.8rem;
+    }
+
+    /* 触摸设备上调整虚拟按键大小 */
+    @media (hover: none) and (pointer: coarse) {
+        .d-pad {
+            grid-template-columns: repeat(3, 52px);
+            grid-template-rows: repeat(2, 52px);
+            gap: 6px;
+        }
+
+        .d-btn {
+            width: 52px;
+            height: 52px;
+        }
+
+        .d-center {
+            width: 52px;
+            height: 52px;
+        }
+
+        .d-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+    }
+}
+
+@media (max-width: 384px) {
+    body {
+        padding: 8px;
+    }
+
+    .game-container {
+        padding: 12px;
+    }
+
+    .game-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .score-value {
+        font-size: 1.2rem;
+    }
+
+    /* 超小屏幕进一步缩小虚拟按键 */
+    @media (hover: none) and (pointer: coarse) {
+        .virtual-controls {
+            margin-top: 12px;
+            padding: 8px 0;
+        }
+
+        .d-pad {
+            grid-template-columns: repeat(3, 48px);
+            grid-template-rows: repeat(2, 48px);
+            gap: 5px;
+        }
+
+        .d-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+        }
+
+        .d-center {
+            width: 48px;
+            height: 48px;
+        }
+
+        .d-btn svg {
+            width: 22px;
+            height: 22px;
+        }
+    }
+}
